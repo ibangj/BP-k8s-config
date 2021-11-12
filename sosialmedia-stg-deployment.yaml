@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+# for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: sosialmedia-deployment
+spec:
+  selector:
+    matchLabels:
+      app: sosialmedia
+  strategy:
+    type: Recreate
+  replicas: 2
+  template:
+    metadata:
+# unlike pod-nginx.yaml, the name is not included in the meta data as a unique name is
+# generated from the deployment name
+      labels:
+        app: sosialmedia
+    spec:
+      containers:
+      - name: sosialmedia
+        image: ibangj/sosialmedia:1-staging-staging
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: config-fb
+          mountPath: "/var/www/html/config.php"
+          subPath: "config.php"
+      volumes:
+      - name: config-fb
+        configMap:
+          name: sosialmedia-configmap
